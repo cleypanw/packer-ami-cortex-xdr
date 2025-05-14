@@ -64,7 +64,7 @@ jobs:
 
 
       - name: Run Packer Init
-        run: packer init AMI-XDR-template.pkr.hcl
+        run: packer init AMI-XDR-template.pkr.json
         working-directory: ./packer-templates
 
       - name: Build AMI with Packer
@@ -85,4 +85,4 @@ jobs:
           cat packer-templates/AMI-XDR-template.pkr.json
           # packer validate packer-templates/AMI-XDR-template.pkr.json || exit 1
           # Run Packer build.
-          packer build packer-templates/AMI-XDR-template.pkr.hcl
+          packer build packer-templates/AMI-XDR-template.pkr.json

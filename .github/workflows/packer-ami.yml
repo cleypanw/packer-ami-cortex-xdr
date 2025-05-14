@@ -48,9 +48,9 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }} 
 
       - name: Set up Packer
-        uses: hashicorp/setup-packer@v1
-        with:
-          version: 'latest' 
+        uses: hashicorp-contrib/setup-packer@v3
+#        with:
+#          version: 'latest' 
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq

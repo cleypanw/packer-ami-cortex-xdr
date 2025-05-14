@@ -3,15 +3,15 @@ name: Build AMI with Packer
 on:
   #push:
   #  branches:
-  #    - main 
+  #    - main
   #  paths:
-  #    - 'packer/**' 
+  #    - 'packer/**'
   #pull_request:
   #  branches:
   #    - main
-  workflow_dispatch: 
+  workflow_dispatch:
     paths:
-      - 'packer-templates/**' 
+      - 'packer-templates/**'
     inputs:
       AWS_REGION:
         description: 'AWS region in which to deploy the infrastructure'
@@ -28,7 +28,7 @@ on:
       XDR_TAGS:
         description: 'TAGS to add to the Agent in the VM Image. Separate each tags by coma : ,' # Please generate first
         required: true
-        default: 'CORTEX,AMI,CLEY'      
+        default: 'CORTEX,AMI,CLEY'
 
 jobs:
   build-ami:
@@ -45,12 +45,12 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ github.event.inputs.AWS_REGION }} 
+          aws-region: ${{ github.event.inputs.AWS_REGION }}
 
       - name: Set up Packer
         uses: hashicorp-contrib/setup-packer@v3
 #        with:
-#          version: 'latest' 
+#          version: 'latest'
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -60,9 +60,9 @@ jobs:
           pwd
           ls -l
           ls -l packer-templates
-        id: list_files # Ajout d'un ID pour référencer l'étape
+        id: list_files
         if: always()
-        
+
       - name: Save Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -92,8 +92,8 @@ jobs:
 
           - name: Validate and Build AMI with Packer
             run: |
+              pwd
               ls -l packer-templates # Vérifiez si le fichier est là après le téléchargement
               cat packer-templates/AMI-XDR-template.pkr.hcl # Vérifiez l'accès
               packer validate packer-templates/AMI-XDR-template.pkr.hcl || exit 1
               packer build packer-templates/AMI-XDR-template.pkr.hcl
-        

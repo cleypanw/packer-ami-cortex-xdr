@@ -64,7 +64,7 @@ jobs:
 
 
       - name: Run Packer Init
-        run: packer init 
+        run: packer init AMI-XDR-template.pkr.hcl
         working-directory: ./packer-templates
 
       - name: Build AMI with Packer

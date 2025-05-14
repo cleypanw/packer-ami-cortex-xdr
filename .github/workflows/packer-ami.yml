@@ -74,7 +74,8 @@ jobs:
           #  Validate the Packer template.
           pwd
           ls -l
-          ls -l packer-templates         
+          ls -l packer-templates
+          cat packer-templates/*.hcl
           cat /home/runner/work/packer-ami-cortex-xdr/packer-ami-cortex-xdr/packer-templates/AMI-XDR-template.pkr.hcl
           packer validate packer-templates/AMI-XDR-template.pkr.hcl || exit 1
           # Run Packer build.

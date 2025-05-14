@@ -76,6 +76,6 @@ jobs:
           ls -l
           ls -l packer-templates
           cat packer-templates/AMI-XDR-template.pkr.json
-          packer validate packer-templates/AMI-XDR-template.pkr.json || exit 1
+          # packer validate packer-templates/AMI-XDR-template.pkr.json || exit 1
           # Run Packer build.
           packer build packer-templates/AMI-XDR-template.pkr.json

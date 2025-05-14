@@ -73,6 +73,7 @@ jobs:
           XDR_TAGS: ${{ github.event.inputs.XDR_TAGS }}
         run: |
           #  Validate the Packer template.
+          cat packer-templates/AMI-XDR-template.pkr.hcl
           packer validate packer-templates/AMI-XDR-template.pkr.hcl || exit 1
           # Run Packer build.
           packer build packer-templates/AMI-XDR-template.pkr.hcl

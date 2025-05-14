@@ -55,11 +55,16 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: List files
+      - name: List files and Save Artifact
         run: |
           pwd
           ls -l
           ls -l packer-templates
+        if: always() # S'exécute même en cas d'échec
+        uses: actions/upload-artifact@v4
+        with:
+          name: packer-template
+          path: packer-templates/AMI-XDR-template.pkr.hcl
 
       - name: Build AMI with Packer
         env:
@@ -71,9 +76,18 @@ jobs:
           AUTH_ID: ${{ secrets.inputs.CORTEX_AUTH_ID }}
           AUTH_TOKEN: ${{ secrets.CORTEX_AUTH_TOKEN }}
           XDR_TAGS: ${{ github.event.inputs.XDR_TAGS }}
+
+        steps:
+          - name: Download Artifact
+            uses: actions/download-artifact@v4
+            with:
+              name: packer-template
+              path: packer-templates/
+              
         run: |
           #  Validate the Packer template.
           cat packer-templates/AMI-XDR-template.pkr.hcl
+
           packer validate packer-templates/AMI-XDR-template.pkr.hcl || exit 1
           # Run Packer build.
           packer build packer-templates/AMI-XDR-template.pkr.hcl

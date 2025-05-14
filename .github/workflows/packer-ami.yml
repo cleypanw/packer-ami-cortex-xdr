@@ -86,9 +86,9 @@ jobs:
         
       - name: Download Artifact
         uses: actions/download-artifact@v4
-          with:
-            name: packer-template
-            path: packer-templates/
+        with:
+          name: packer-template
+          path: packer-templates/
 
       - name: Validate and Build AMI with Packer
         run: |

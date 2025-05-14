@@ -1,0 +1,71 @@
+name: Build AMI with Packer
+
+on:
+  #push:
+  #  branches:
+  #    - main 
+  #  paths:
+  #    - 'packer/**' 
+  #pull_request:
+  #  branches:
+  #    - main 
+    paths:
+      - 'packer/**' 
+    inputs:
+      AWS_REGION:
+        description: 'AWS region in which to deploy the infrastructure'
+        required: true
+        default: 'eu-west-3'
+      XDR_API_URL:
+        description: 'API URL of the Cortex Tenant'
+        required: true
+        default: 'https://api-emea-cxsiamp.xdr.eu.paloaltonetworks.com'
+      DISTRIBUTION_ID:
+        description: 'Distribution_ID = ID of XDR Installer on Cortex Cloud' # Please generate first
+        required: true
+        default: '1b806ed9213f480c9041e1c310d18bc8'
+      XDR_TAGS:
+        description: 'TAGS to add to the Agent in the VM Image. Separate each tags by coma : ,' # Please generate first
+        required: true
+        default: 'CORTEX,AMI,CLEY'      
+
+jobs:
+  build-ami:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Needed for OIDC
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }} 
+
+      - name: Set up Packer
+        uses: hashicorp/setup-packer@v1
+        with:
+          version: 'latest' 
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Build AMI with Packer
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} 
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
+          AWS_REGION: ${{ github.event.inputs.AWS_REGION }}
+          XDR_URL: ${{ github.event.inputs.XDR_API_URL }}
+          DISTRIBUTION_ID: ${{ github.event.inputs.DISTRIBUTION_ID }}
+          AUTH_ID: ${{ secrets.inputs.CORTEX_AUTH_ID }}
+          AUTH_TOKEN: ${{ secrets.CORTEX_AUTH_TOKEN }}
+          XDR_TAGS: ${{ github.event.inputs.XDR_TAGS }}
+        run: |
+          #  Validate the Packer template.
+          packer validate packer-templates/AMI-XDR-template.pkr.hcl || exit 1
+          # Run Packer build.
+          packer build packer-templates/AMI-XDR-template.pkr.hcl

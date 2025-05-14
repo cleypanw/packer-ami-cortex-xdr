@@ -83,17 +83,17 @@ jobs:
           AUTH_ID: ${{ secrets.inputs.CORTEX_AUTH_ID }}
           AUTH_TOKEN: ${{ secrets.inputs.CORTEX_AUTH_TOKEN }}
           XDR_TAGS: ${{ github.event.inputs.XDR_TAGS }}
-        steps:
-          - name: Download Artifact
-            uses: actions/download-artifact@v4
-            with:
-              name: packer-template
-              path: packer-templates/
+        
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+          with:
+            name: packer-template
+            path: packer-templates/
 
-          - name: Validate and Build AMI with Packer
-            run: |
-              pwd
-              ls -l packer-templates # Vérifiez si le fichier est là après le téléchargement
-              cat packer-templates/AMI-XDR-template.pkr.hcl # Vérifiez l'accès
-              packer validate packer-templates/AMI-XDR-template.pkr.hcl || exit 1
-              packer build packer-templates/AMI-XDR-template.pkr.hcl
+      - name: Validate and Build AMI with Packer
+        run: |
+          pwd
+          ls -l packer-templates # Vérifiez si le fichier est là après le téléchargement
+          cat packer-templates/AMI-XDR-template.pkr.hcl # Vérifiez l'accès
+          packer validate packer-templates/AMI-XDR-template.pkr.hcl || exit 1
+          packer build packer-templates/AMI-XDR-template.pkr.hcl

@@ -3,15 +3,15 @@ name: Build AMI with Packer
 on:
   #push:
   #  branches:
-  #    - main
+  #    - main 
   #  paths:
-  #    - 'packer/**'
+  #    - 'packer/**' 
   #pull_request:
   #  branches:
   #    - main
-  workflow_dispatch:
+  workflow_dispatch: 
     paths:
-      - 'packer-templates/**'
+      - 'packer-templates/**' 
     inputs:
       AWS_REGION:
         description: 'AWS region in which to deploy the infrastructure'
@@ -28,7 +28,7 @@ on:
       XDR_TAGS:
         description: 'TAGS to add to the Agent in the VM Image. Separate each tags by coma : ,' # Please generate first
         required: true
-        default: 'CORTEX,AMI,CLEY'
+        default: 'CORTEX,AMI,CLEY'      
 
 jobs:
   build-ami:
@@ -45,12 +45,12 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ github.event.inputs.AWS_REGION }}
+          aws-region: ${{ github.event.inputs.AWS_REGION }} 
 
       - name: Set up Packer
         uses: hashicorp-contrib/setup-packer@v3
 #        with:
-#          version: 'latest'
+#          version: 'latest' 
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -60,39 +60,19 @@ jobs:
           pwd
           ls -l
           ls -l packer-templates
-        id: list_files
-        if: always()
-
-      - name: Save Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: packer-template
-          path: packer-templates/AMI-XDR-template.pkr.hcl
-        if: always()
-        needs: list_files
-
       - name: Build AMI with Packer
-        needs: Save Artifact
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }} 
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
           AWS_REGION: ${{ github.event.inputs.AWS_REGION }}
           XDR_URL: ${{ github.event.inputs.XDR_API_URL }}
           DISTRIBUTION_ID: ${{ github.event.inputs.DISTRIBUTION_ID }}
           AUTH_ID: ${{ secrets.inputs.CORTEX_AUTH_ID }}
-          AUTH_TOKEN: ${{ secrets.inputs.CORTEX_AUTH_TOKEN }}
+          AUTH_TOKEN: ${{ secrets.CORTEX_AUTH_TOKEN }}
           XDR_TAGS: ${{ github.event.inputs.XDR_TAGS }}
-        
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: packer-template
-          path: packer-templates/
-
-      - name: Validate and Build AMI with Packer
         run: |
-          pwd
-          ls -l packer-templates # Vérifiez si le fichier est là après le téléchargement
-          cat packer-templates/AMI-XDR-template.pkr.hcl # Vérifiez l'accès
+          #  Validate the Packer template.
+          cat packer-templates/AMI-XDR-template.pkr.hcl
           packer validate packer-templates/AMI-XDR-template.pkr.hcl || exit 1
+          # Run Packer build.
           packer build packer-templates/AMI-XDR-template.pkr.hcl

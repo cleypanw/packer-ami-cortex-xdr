@@ -8,9 +8,10 @@ on:
   #    - 'packer/**' 
   #pull_request:
   #  branches:
-  #    - main 
+  #    - main
+  workflow_dispatch: 
     paths:
-      - 'packer/**' 
+      - 'packer-templates/**' 
     inputs:
       AWS_REGION:
         description: 'AWS region in which to deploy the infrastructure'

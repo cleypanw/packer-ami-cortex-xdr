@@ -55,6 +55,14 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
+      # --- Ajoutez ces étapes de debug ---
+      - name: List files in root
+        run: ls -la
+      - name: List files in packer-templates directory
+        run: ls -la ./packer-templates
+      # -----------------------------------
+
+
       - name: Run Packer Init
         run: packer init 
         working-directory: ./packer-templates

@@ -83,6 +83,7 @@ jobs:
         with:
           name: packer-template
           path: packer-templates/
+          
       - name: Validate and Build AMI with Packer
         run: |
           #  Validate the Packer template.

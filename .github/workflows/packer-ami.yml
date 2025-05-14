@@ -1,4 +1,4 @@
-name: Build AMI with Packer
+name: Use Packer to generate a Cortex XDR-enabled AMI.
 
 on:
   #push:
@@ -72,7 +72,7 @@ jobs:
           XDR_TAGS: ${{ github.event.inputs.XDR_TAGS }}
         run: |
           #  Validate the Packer template.
-          cat /home/runner/work/packer-ami-cortex-xdr/packer-ami-cortex-xdr
+          cat /home/runner/work/packer-ami-cortex-xdr/packer-ami-cortex-xdr/packer-templates/AMI-XDR-template.pkr.hcl
           packer validate packer-templates/AMI-XDR-template.pkr.hcl || exit 1
           # Run Packer build.
           packer build packer-templates/AMI-XDR-template.pkr.hcl

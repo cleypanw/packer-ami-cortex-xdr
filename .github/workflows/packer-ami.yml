@@ -33,9 +33,9 @@ on:
 jobs:
   build-ami:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write # Needed for OIDC
-      contents: read
+#    permissions:
+#      id-token: write # Needed for OIDC
+#      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

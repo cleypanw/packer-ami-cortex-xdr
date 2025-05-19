@@ -181,4 +181,4 @@ tar -zxvf XDR-Linux.tar.gz
 sudo mkdir -p /etc/panw
 sudo cp cortex.conf /etc/panw/
 sudo chmod +x *.sh
-sudo bash cortex-*.sh
+sudo bash cortex-*.sh -- --endpoint-tags $XDR_TAGS

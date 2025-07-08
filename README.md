@@ -16,6 +16,7 @@ This repository automates the creation of an **Amazon Machine Image (AMI)** base
 ---
 
 ## 📂 Repository Structure
+```
 ├── packer-templates/
 │ └── AMI-XDR-template.pkr.hcl # Packer HCL template
 ├── scripts/
@@ -24,6 +25,7 @@ This repository automates the creation of an **Amazon Machine Image (AMI)** base
 │ └── workflows/
 │ └── build-ami.yml # GitHub Action workflow
 └── README.md 
+```
 
 ---
 
@@ -61,7 +63,7 @@ They can be configured by navigating to: `Repository > Settings > Secrets and va
 ---
 
 ## 🧱 Architecture Diagram
-![Build an AMI with the XDR agent using Packer](docs/images/Build an AMI with the XDR agent using Packer.png)
+![BuildanAMIwiththeXDRagentusingPacker](docs/images/BuildanAMIwiththeXDRagentusingPacker.png)
 ---
 
 ## 📦 Packer Template Highlights
@@ -89,3 +91,14 @@ Once complete, find the created AMI ID in the workflow logs or directly in the A
 A reusable Ubuntu AMI with Cortex XDR Agent pre-installed.
 
 EC2 instances launched with this AMI will auto-register in Cortex XDR tenant with specified tags and policies.
+
+---
+## Appendix
+![CI](docs/images/ci.png)
+---
+![AMI](docs/images/AMI.png)
+---
+![ec2](docs/images/ec2.png)
+---
+![cortex](docs/images/cortex.png)
+---

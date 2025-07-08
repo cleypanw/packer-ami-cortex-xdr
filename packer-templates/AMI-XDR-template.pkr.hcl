@@ -49,7 +49,7 @@ variable "xdr_tags" {
 # Définition de la source de l'AMI à partir de laquelle construire (type amazon-ebs)
 source "amazon-ebs" "xdr-agent" {
   region     = var.aws_region
-  source_ami = "ami-08b91bcec596d82d8"  # Ubuntu 22.04 LTS officiel - eu-west-3
+  source_ami = "ami-0388f26d76e0472c6"  # Ubuntu 22.04 LTS officiel - eu-west-3
   instance_type = "t2.micro"
   ssh_username = "ubuntu"
   ami_name = "xdr-agent-ubuntu-{{timestamp}}"

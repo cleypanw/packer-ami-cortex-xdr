@@ -1,0 +1,18 @@
+@startuml
+actor User
+participant "GitHub Actions" as GH
+participant "Packer CLI" as Packer
+participant "AWS EC2 - AMI Template" as AWS
+participant "AWS EC2 - XDR" as EC2
+participant "Cortex XDR Tenant" as XDR
+
+User -> GH: Trigger workflow with inputs (AWS_REGION, XDR_API_URL, DISTRIBUTION_ID, XDR_TAGS)
+GH -> Packer: Init, validate, and build AMI with environment variables
+Packer -> AWS: Provision temporary EC2 instance
+AWS -> AWS: Execute install-xdr-linux-auto.sh to install Cortex XDR agent
+AWS -> Packer: Create AMI from configured instance
+Packer -> GH: Return AMI ID
+User -> EC2: Launching an EC2 instance with AMI ID
+EC2 -> XDR: Agent registers with Cortex tenant and uses tags to apply policy
+XDR -> User: Instance visible in Cortex XDR tenant
+@enduml

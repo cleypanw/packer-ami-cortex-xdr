@@ -57,7 +57,7 @@ build {
   sources = ["source.amazon-ebs.xdr-agent"]
 
   provisioner "file" {
-    source      = "../scripts/install-xdr-linux-auto.sh" # <- ajuste si le script est ailleurs
+    source      = "../scripts/install-xdr-linux-auto.sh" 
     destination = "/tmp/install-xdr.sh"
   }
 

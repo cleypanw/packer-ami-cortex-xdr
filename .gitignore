@@ -1,0 +1,58 @@
+# Logs
+*.log
+*.out
+*.err
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+.venv/
+*.egg-info/
+
+# Packer
+packer_cache/
+*.pkr.hcl
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Secrets and sensitive files
+*.pem
+*.key
+*.crt
+*.env
+secrets.yml
+credentials.json
+
+# GitHub Actions
+# Ignore runtime generated files (if any)
+*.bak
+
+# Build artifacts
+dist/
+build/
+*.zip
+*.tar.gz
+
+# AMI Build scripts
+*.sh~    # Backup scripts
+*.tmp

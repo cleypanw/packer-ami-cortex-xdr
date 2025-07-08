@@ -68,19 +68,20 @@ jobs:
         working-directory: ./packer-templates
 
       - name: Validate Packer template
-        # Passe les valeurs des inputs du workflow et des secrets aux variables définies
-        # dans le template Packer (bloc 'variable'). Le préfixe PKR_VAR_ est obligatoire
-        # pour mapper les variables d'environnement aux variables Packer en HCL.
-        PKR_VAR_aws_region: ${{ github.event.inputs.AWS_REGION }}
-        PKR_VAR_xdr_url: ${{ github.event.inputs.XDR_API_URL }}
-        PKR_VAR_distribution_id: ${{ github.event.inputs.DISTRIBUTION_ID }}
-        # Accès correct aux secrets GitHub : ${{ secrets.NOM_DU_SECRET }}
-        PKR_VAR_auth_id: ${{ secrets.CORTEX_AUTH_ID }}
-        PKR_VAR_auth_token: ${{ secrets.CORTEX_AUTH_TOKEN }}
-        PKR_VAR_xdr_tags: ${{ github.event.inputs.XDR_TAGS }}
+        working-directory: ./packer-templates
+        env:
+          # Passe les valeurs des inputs du workflow et des secrets aux variables définies
+          # dans le template Packer (bloc 'variable'). Le préfixe PKR_VAR_ est obligatoire
+          # pour mapper les variables d'environnement aux variables Packer en HCL.
+          PKR_VAR_aws_region: ${{ github.event.inputs.AWS_REGION }}
+          PKR_VAR_xdr_url: ${{ github.event.inputs.XDR_API_URL }}
+          PKR_VAR_distribution_id: ${{ github.event.inputs.DISTRIBUTION_ID }}
+          # Accès correct aux secrets GitHub : ${{ secrets.NOM_DU_SECRET }}
+          PKR_VAR_auth_id: ${{ secrets.CORTEX_AUTH_ID }}
+          PKR_VAR_auth_token: ${{ secrets.CORTEX_AUTH_TOKEN }}
+          PKR_VAR_xdr_tags: ${{ github.event.inputs.XDR_TAGS }}
         # Valide la syntaxe du template HCL. Utile pour détecter les erreurs avant de construire.
         run: packer validate AMI-XDR-template.pkr.hcl
-        working-directory: ./packer-templates
 
       - name: Build AMI with Packer
         # Lance la construction de l'AMI en utilisant le template HCL.

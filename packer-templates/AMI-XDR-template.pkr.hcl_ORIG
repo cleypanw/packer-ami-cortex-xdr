@@ -83,6 +83,11 @@ build {
       # Accès aux variables via les variables d'environnement injectées par Packer
       # Packer injecte automatiquement les variables définies dans le bloc 'variable'
       # et passées via PKR_VAR_ comme variables d'environnement dans le shell.
+      "XDR_URL=\"${XDR_URL}\"",
+      "DISTRIBUTION_ID=\"${DISTRIBUTION_ID}\"",
+      "AUTH_ID=\"${AUTH_ID}\"",
+      "AUTH_TOKEN=\"${AUTH_TOKEN}\"",
+      "XDR_TAGS=\"${XDR_TAGS}\"",
       "HEALTHCHECK_URL=\"$XDR_URL/public_api/v1/healthcheck\"",
       # Les doubles barres obliques inversées (\\) sont nécessaires en HCL pour échapper les sauts de ligne
       "health_response=$(curl --silent --location \"$HEALTHCHECK_URL\" \\",

@@ -1,0 +1,111 @@
+# .github/workflows/build-ami.yml
+
+name: Use Packer to generate a Cortex XDR-enabled AMI.
+
+on:
+  # Déclenchement manuel du pipeline depuis l'interface GitHub
+  workflow_dispatch:
+    inputs:
+      AWS_REGION:
+        description: 'AWS region in which to deploy the infrastructure'
+        required: true
+        default: 'eu-west-3'
+      XDR_API_URL:
+        description: 'API URL of the Cortex Tenant'
+        required: true
+        default: 'https://api-emea-cxsiamp.xdr.eu.paloaltonetworks.com'
+      DISTRIBUTION_ID:
+        description: 'Distribution_ID = ID of XDR Installer on Cortex Cloud' # Please generate first
+        required: true
+        default: '1b806ed9213f480c9041e1c310d18bc8'
+      XDR_TAGS:
+        description: 'TAGS to add to the Agent in the VM Image. Separate each tags by coma : ,' # Please generate first
+        required: true
+        default: 'CORTEX,AMI,CLEY'
+
+jobs:
+  build-ami:
+    runs-on: ubuntu-latest # Utilise un runner Ubuntu hébergé par GitHub
+    #permissions:
+    #  id-token: write # Décommenter si vous utilisez l'authentification OIDC
+    #  contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # Clone le dépôt
+
+      - name: Set up AWS credentials
+        # Configure les variables d'environnement AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY et AWS_REGION
+        # pour que Packer puisse s'authentifier auprès d'AWS.
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # Récupère la clé d'accès depuis les secrets GitHub
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # Récupère la clé secrète depuis les secrets GitHub
+          aws-region: ${{ github.event.inputs.AWS_REGION }} # Utilise la région fournie en input du workflow
+
+      - name: Set up Packer
+        # Installe Packer et l'ajoute au PATH.
+        uses: hashicorp-contrib/setup-packer@v3
+        # Si vous avez besoin d'une version spécifique, décommentez et ajustez :
+        # with:
+        #   version: '1.10.0' # Remplacez par la version souhaitée
+
+      - name: Install jq
+        # Installe jq, nécessaire pour le parsing JSON dans votre script shell.
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      # --- Étapes de debug - vous pouvez les commenter ou les supprimer une fois que ça fonctionne ---
+      # - name: List files in root
+      #   run: ls -la
+      # - name: List files in packer-templates directory
+      #   run: ls -la ./packer-templates
+      # ------------------------------------------------------------------------------------------
+
+      - name: Run Packer Init
+        # Initialise Packer et télécharge les plugins requis (spécifiés dans le bloc packer{} du HCL).
+        # Le working-directory assure que Packer est dans le bon répertoire pour trouver le template.
+        run: packer init .
+        working-directory: ./packer-templates
+
+      - name: Validate Packer template
+        working-directory: ./packer-templates
+        env:
+          # Passe les valeurs des inputs du workflow et des secrets aux variables définies
+          # dans le template Packer (bloc 'variable'). Le préfixe PKR_VAR_ est obligatoire
+          # pour mapper les variables d'environnement aux variables Packer en HCL.
+          PKR_VAR_aws_region: ${{ github.event.inputs.AWS_REGION }}
+          PKR_VAR_xdr_url: ${{ github.event.inputs.XDR_API_URL }}
+          PKR_VAR_distribution_id: ${{ github.event.inputs.DISTRIBUTION_ID }}
+          # Accès correct aux secrets GitHub : ${{ secrets.NOM_DU_SECRET }}
+          PKR_VAR_auth_id: ${{ secrets.CORTEX_AUTH_ID }}
+          PKR_VAR_auth_token: ${{ secrets.CORTEX_AUTH_TOKEN }}
+          PKR_VAR_xdr_tags: ${{ github.event.inputs.XDR_TAGS }}
+        # Valide la syntaxe du template HCL. Utile pour détecter les erreurs avant de construire.
+        run: packer validate AMI-XDR-template.pkr.hcl
+
+      - name: Build AMI with Packer
+        # Lance la construction de l'AMI en utilisant le template HCL.
+        # Le working-directory assure que Packer est dans le bon répertoire.
+        working-directory: ./packer-templates
+        env:
+          # Passe les valeurs des inputs du workflow et des secrets aux variables définies
+          # dans le template Packer (bloc 'variable'). Le préfixe PKR_VAR_ est obligatoire
+          # pour mapper les variables d'environnement aux variables Packer en HCL.
+          PKR_VAR_aws_region: ${{ github.event.inputs.AWS_REGION }}
+          PKR_VAR_xdr_url: ${{ github.event.inputs.XDR_API_URL }}
+          PKR_VAR_distribution_id: ${{ github.event.inputs.DISTRIBUTION_ID }}
+          # Accès correct aux secrets GitHub : ${{ secrets.NOM_DU_SECRET }}
+          PKR_VAR_auth_id: ${{ secrets.CORTEX_AUTH_ID }}
+          PKR_VAR_auth_token: ${{ secrets.CORTEX_AUTH_TOKEN }}
+          PKR_VAR_xdr_tags: ${{ github.event.inputs.XDR_TAGS }}
+
+          # Si, pour une raison spécifique, votre script shell dans le provisioner
+          # a besoin d'accéder directement à des variables d'environnement non mappées
+          # à des variables Packer (moins courant en HCL), vous pourriez les définir ici
+          # sans le préfixe PKR_VAR_. Mais pour les variables définies dans le bloc 'variable',
+          # l'approche PKR_VAR_ est recommandée.
+          # EXEMPLE (si non mappé à une variable HCL): SOME_OTHER_VAR: 'value'
+
+        run: |
+          # Exécute la commande build en spécifiant le fichier template HCL.
+          packer build AMI-XDR-template.pkr.hcl

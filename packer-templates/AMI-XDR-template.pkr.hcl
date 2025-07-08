@@ -48,20 +48,11 @@ variable "xdr_tags" {
 
 # Définition de la source de l'AMI à partir de laquelle construire (type amazon-ebs)
 source "amazon-ebs" "xdr-agent" {
-  region        = var.aws_region # Utilise la variable aws_region définie ci-dessus
-  source_ami_filter {
-    filters = {
-      name                 = "ubuntu/images/*/ubuntu-*-22.04-amd64-server-*"
-      root-device-type     = "ebs"
-      virtualization-type  = "hvm"
-      architecture         = "amd64"
-    }
-    owners      = ["099720109477"] # ID du compte Canonical pour les AMIs Ubuntu
-    most_recent = true # Prend la dernière AMI correspondante
-  }
-  instance_type = "t2.micro" # Type d'instance temporaire pour la construction
-  ssh_username  = "ubuntu" # Nom d'utilisateur SSH pour se connecter à l'instance de construction
-  ami_name      = "xdr-agent-ubuntu-{{timestamp}}" # Nom de l'AMI finale avec timestamp
+  region     = var.aws_region
+  source_ami = "ami-08b91bcec596d82d8"  # Ubuntu 22.04 LTS officiel - eu-west-3
+  instance_type = "t2.micro"
+  ssh_username = "ubuntu"
+  ami_name = "xdr-agent-ubuntu-{{timestamp}}"
   tags = {
     Name    = "XDR Agent Ubuntu AMI"
     OS      = "Ubuntu"

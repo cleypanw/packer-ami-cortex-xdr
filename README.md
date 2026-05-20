@@ -23,7 +23,7 @@ This repository automates the creation of an **Amazon Machine Image (AMI)** base
 │ └── install-xdr-linux-auto.sh # Cortex XDR agent install script
 ├── .github/
 │ └── workflows/
-│ └── build-ami.yml # GitHub Action workflow
+│ └── packer-ami.yml # GitHub Action workflow
 └── README.md 
 ```
 
@@ -37,24 +37,32 @@ Navigate to: `Actions > Use Packer to generate a Cortex XDR-enabled AMI. > Run W
 ![pipeline-input](docs/images/pipeline-input.png)
 ---
 
-| Name              | Description                                | Required | Default Value (to override)                            |
-| ----------------- | ------------------------------------------ | -------- | ------------------------------------------------------ |
-| `AWS_REGION`      | AWS region where the AMI will be built     | Yes      | `eu-west-3` (Paris)                                    |
-| `XDR_API_URL`     | Cortex Tenant API URL                      | Yes      | `https://api-emea-cxsiamp.xdr.eu.paloaltonetworks.com` |
-| `DISTRIBUTION_ID` | Cortex XDR Agent Installer Distribution ID | Yes      | `1b806ed9213f480c9041e1c310d18bc8`                     |
-| `XDR_TAGS`        | Comma-separated tags to apply on the agent | Yes      | `CORTEX,AMI,CLEY`                                      |
+| Name                    | Description                                       | Required | Default Value (to override)                            |
+| ----------------------- | ------------------------------------------------- | -------- | ------------------------------------------------------ |
+| `AWS_ACCESS_KEY_ID`     | AWS Access Key ID                                 | Yes      | `<CHANGE ME>`                                          |
+| `AWS_SECRET_ACCESS_KEY` | AWS Secret Access Key                             | Yes      | `<CHANGE ME>`                                          |
+| `AWS_SESSION_TOKEN`     | AWS Security Token (STS Token, for temporary creds) | Yes    | `<CHANGE ME>`                                          |
+| `AWS_REGION`            | AWS region where the AMI will be built            | Yes      | `eu-west-3` (Paris)                                    |
+| `XDR_API_URL`           | Cortex Tenant API URL                             | Yes      | `https://api-emea-cxsiamp.xdr.eu.paloaltonetworks.com` |
+| `DISTRIBUTION_ID`       | Cortex XDR Agent Installer Distribution ID        | Yes      | `1b806ed9213f480c9041e1c310d18bc8`                     |
+| `XDR_TAGS`              | Comma-separated tags to apply on the agent        | Yes      | `CORTEX,AMI,CLEY`                                      |
+
+> ⚠️ **Security note** — AWS credentials are now passed as workflow inputs, not GitHub secrets.
+> Unlike `secrets`, `workflow_dispatch` inputs are **not automatically masked** and remain visible in the run metadata (API, run history). The workflow calls `::add-mask::` to hide the values from log output as a mitigation, but the credentials still appear in the run's input parameters page. For long-term use, prefer **OIDC with `role-to-assume`** instead of static keys.
+>
+> If you use long-term keys (`AKIA...`), put any non-empty placeholder in `AWS_SESSION_TOKEN` (the field is required by the form).
 
 ---
 
 ## 🔐 Required GitHub Secrets
 
-Secrets in GitHub are used to securely store sensitive information, such as API keys or credentials, for use in GitHub Actions. 
+Secrets in GitHub are used to securely store sensitive information, such as API keys or credentials, for use in GitHub Actions.
 They can be configured by navigating to: `Repository > Settings > Secrets and variables > Actions`.
 
-- `AWS_ACCESS_KEY_ID` : AWS Access Key ID
-- `AWS_SECRET_ACCESS_KEY` : AWS Secret Access Key
 - `CORTEX_AUTH_ID` : Cortex API Authentication ID
 - `CORTEX_AUTH_TOKEN` : Cortex API Authentication Token
+
+> AWS credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`) are **no longer** stored as GitHub secrets — they are entered directly in the workflow form at run time.
 
 ---
 

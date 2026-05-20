@@ -40,11 +40,21 @@ variable "xdr_tags" {
 }
 
 source "amazon-ebs" "xdr-agent" {
-  region       = var.aws_region
-  source_ami   = "ami-0388f26d76e0472c6" # Ubuntu 22.04 LTS - eu-west-3
-  instance_type = "t2.micro"
-  ssh_username = "ubuntu"
-  ami_name     = "xdr-agent-ubuntu-{{timestamp}}"
+  region        = var.aws_region
+  source_ami    = "ami-0388f26d76e0472c6" # Ubuntu 22.04 LTS - eu-west-3
+  instance_type = "t3.micro"
+  ssh_username  = "ubuntu"
+  ami_name      = "xdr-agent-ubuntu-{{timestamp}}"
+
+  encrypt_boot = true
+
+  launch_block_device_mappings {
+    device_name           = "/dev/sda1"
+    volume_size           = 8
+    volume_type           = "gp3"
+    encrypted             = true
+    delete_on_termination = true
+  }
 
   tags = {
     Name    = "XDR Agent Ubuntu AMI"
